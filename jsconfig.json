@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "module": "CommonJS",
+    "target": "es6",
+    "baseUrl": "./",
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "paths": {
+      "sequelize": [
+        "./node_modules/sequelize/index.js"
+      ],
+      "Sequelize": [
+        "./node_modules/sequelize/index.js"
+      ],
+    }
+  },
+  "exclude": [
+    "dist",
+  ],
+  "typeAcquisition": {
+    "include": [
+      "node",
+    ]
+  }
+}
