@@ -21,7 +21,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.resolve(__dirname, 'public')));
 app.set('view engine', 'ejs');
 
-const { Weather, sequelize } = require('./db/models/index');
+const { Weather, sequelize } = require('./db/models/index.js');
 
 parserSerialPort.on('data', (data) => {
   let dataTmp = String(data).split(',').map((element) => {

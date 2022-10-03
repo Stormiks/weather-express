@@ -11,6 +11,16 @@ module.exports = {
         allowIndentationTabs: true,
       },
     ],
+    'import/extensions': [
+      'error',
+      'ignorePackages',
+      {
+        ignorePackages: true,
+        pattern: {
+          js: 'always',
+        },
+      },
+    ],
   },
   ignorePatterns: ['**/node_modules/**/*', 'less.js'],
 };

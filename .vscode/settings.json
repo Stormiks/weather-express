@@ -2,25 +2,18 @@
   "files.watcherExclude": {
     "**/.git/objects/**": true,
     "**/.git/subtree-cache/**": true,
-    "**/client/node_modules/*/**": true,
-    "**/server/node_modules/*/**": true,
-    "**/client/dist/*/**": true,
   },
   "files.associations": {
     "*.js": "javascript"
   },
   "files.insertFinalNewline": true,
-  "files.exclude": {
-    "**/client/dist": false,
-  },
   "emmet.includeLanguages": {
     "javascript": "javascript",
     "ejs": "html"
   },
   "emmet.triggerExpansionOnTab": true,
   "eslint.workingDirectories": [
-    "${workspaceRoot}/server",
-    "${workspaceRoot}/client"
+    "${workspaceRoot}/",
   ],
   "eslint.validate": [
     "javascript",
@@ -47,7 +40,7 @@
   },
   "editor.semanticHighlighting.enabled": true,
   "path-intellisense.autoSlashAfterDirectory": false,
-  "path-intellisense.extensionOnImport": false,
+  "path-intellisense.extensionOnImport": true,
   "path-intellisense.absolutePathToWorkspace": false,
   "path-intellisense.mappings": {
     "~": "${workspaceRoot}",
