@@ -1,7 +1,7 @@
 /**
  * @typedef {import('sequelize').DataTypes} DataTypes
  * @typedef {import('sequelize').Sequelize} Sequelize
- * @typedef {import('Weather')} Weather
+ * @typedef {import('Sensor')} Sensor
  */
 
 const {
@@ -9,26 +9,26 @@ const {
 } = require('sequelize');
 
 /**
- * @class Weather
- * @module Weather
+ * @class Sensor
+ * @module Sensor
  */
-class Weather extends Model {}
+class Sensor extends Model {}
 
 /**
- * @module Weather
+ * @module Sensor
  * @param {Sequelize} sequelize
  * @param {DataTypes} DataTypes
  */
 module.exports = (sequelize, DataTypes) => {
-  Weather.init({
-    temperature: DataTypes.REAL,
-    humidity: DataTypes.REAL,
+  Sensor.init({
+    deviceId: DataTypes.STRING,
+    serialNumber: DataTypes.STRING,
+    manufacturerId: DataTypes.STRING,
   }, {
     sequelize,
-    modelName: 'Weather',
-    tableName: 'weather',
+    modelName: 'Sensor',
+    tableName: 'sensor',
     paranoid: true,
   });
-
-  return Weather;
+  return Sensor;
 };
