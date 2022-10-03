@@ -45,12 +45,13 @@ app.get('/', (req, res) => {
 });
 
 app.get('/list', (req, res) => {
-  console.log();
+  const PAGE_LIMIT = 10;
+
   Weather.findAndCountAll({
     raw: true,
     nest: true,
-    limit: 10,
-    offset: 10 * req.query.page,
+    limit: PAGE_LIMIT,
+    offset: (req.query.page - 1) * PAGE_LIMIT,
   }).then((data) => {
     res.json(data);
   }).catch((err) => res.send({ err }));
