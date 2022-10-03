@@ -21,25 +21,46 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.resolve(__dirname, 'public')));
 app.set('view engine', 'ejs');
 
-const { Weather, sequelize } = require('./db/models/index.js');
+const { Weather, Sensor, sequelize } = require('./db/models/index.js');
 
 parserSerialPort.on('data', (data) => {
-  const parseRawData = Array.from(String(data).split(',').map((element) => {
+  const [type, message] = String(data).split('@');
+  const emit = {
+    SensorData: (str) => Number(str),
+    SensorDetail: (str) => String(str),
+  };
+
+  const parseRawData = Array.from(message.split(',').map((element) => {
     const str = element.split(':');
 
     return {
-      [str[0]]: String(str[1]),
+      [str[0]]: emit[type](str[1]),
     };
   })).reduce((prevVal, curVal) => Object.assign(prevVal, curVal), {});
 
-  if (parseRawData.deviceId) {
-    console.log('[SENSOR INFO]');
-  } else if (parseRawData.T && parseRawData.H) {
-    console.log('[SENSOR DATA]');
-    Weather.create({
-      temperature: parseRawData.T,
-      humidity: parseRawData.H,
-    });
+  switch (type) {
+    case 'SensorDetail':
+      console.log('[SENSOR INFO]');
+      Sensor.create({
+        deviceId: parseRawData.deviceId,
+        serialNumber: parseRawData.deviceSerialNumber,
+        manufacturerId: parseRawData.manufacturerId,
+      });
+      break;
+
+    case 'SensorData':
+      console.log('[SENSOR DATA]');
+      Sensor.findByPk(1).then((sensor) => {
+        sensor.createWeather({
+          temperature: parseRawData.T,
+          humidity: parseRawData.H,
+        });
+      });
+      break;
+
+    default:
+      console.error('[ERROR]: Not found emits');
+      break;
   }
 });
 
