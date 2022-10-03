@@ -24,20 +24,23 @@ app.set('view engine', 'ejs');
 const { Weather, sequelize } = require('./db/models/index.js');
 
 parserSerialPort.on('data', (data) => {
-  let dataTmp = String(data).split(',').map((element) => {
-    const str = element.split('=');
+  const parseRawData = Array.from(String(data).split(',').map((element) => {
+    const str = element.split(':');
 
     return {
-      [str[0]]: Number(str[1]),
+      [str[0]]: String(str[1]),
     };
-  });
+  })).reduce((prevVal, curVal) => Object.assign(prevVal, curVal), {});
 
-  dataTmp = { ...dataTmp[0], ...dataTmp[1] };
-
-  Weather.create({
-    temperature: dataTmp.T,
-    humidity: dataTmp.H,
-  });
+  if (parseRawData.deviceId) {
+    console.log('[SENSOR INFO]');
+  } else if (parseRawData.T && parseRawData.H) {
+    console.log('[SENSOR DATA]');
+    Weather.create({
+      temperature: parseRawData.T,
+      humidity: parseRawData.H,
+    });
+  }
 });
 
 app.get('/', (req, res) => {
@@ -63,5 +66,6 @@ app.listen(PORT, 'localhost', async () => {
     console.log(`Server start http://localhost:${PORT}`);
   } catch (error) {
     console.error('Unable to connect to the database:', error);
+    process.exit(-1);
   }
 });

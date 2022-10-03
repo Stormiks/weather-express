@@ -25,7 +25,8 @@ module.exports = (sequelize, DataTypes) => {
     humidity: DataTypes.REAL,
   }, {
     sequelize,
-    modelName: 'weather',
+    modelName: 'Weather',
+    tableName: 'weather',
     paranoid: true,
   });
 

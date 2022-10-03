@@ -19,35 +19,11 @@ if (config.use_env_variable) {
   sequelize = new Sequelize(config.database, config.username, config.password, config);
 }
 
-/**
-  * @type Weather
-  * @namespace Weather
-  * @property {DataTypes} Weather.humidity
-  * @property {DataTypes} Weather.temperature
-  * @method findAll
-  * @method findOne
-  * @method findByPk
-  * @method create
-  * @returns {this.Weather} Weather model
-  */
-// eslint-disable-next-line import/extensions
 const Weather = require('./weather.js')(sequelize, Sequelize.DataTypes);
+const Sensor = require('./sensor.js')(sequelize, Sequelize.DataTypes);
 
-// fs
-//   .readdirSync(__dirname)
-//   .filter((file) => (file.indexOf('.') !== 0) && (file !== basename) && (file.slice(-3) === '.js'))
-//   .forEach((file) => {
-//     const model = require(path.join(__dirname, file))(sequelize, Sequelize.DataTypes);
-//     db[model.name] = model;
-//   });
+Sensor.hasMany(Weather, { onDelete: 'cascade' });
 
-// Object.keys(db).forEach((modelName) => {
-//   if (db[modelName].associate) {
-//     db[modelName].associate(db);
-//   }
-// });
-
-// db.sequelize = sequelize;
-// db.Sequelize = Sequelize;
-
-module.exports = { Weather, sequelize, Sequelize };
+module.exports = {
+  Weather, Sensor, sequelize, Sequelize,
+};
