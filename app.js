@@ -53,6 +53,12 @@ app.listen(PORT, 'localhost', async () => {
       const parseRawData = Array.from(message.split(',').map((element) => {
         const str = element.split(':');
 
+        if (String(str[0]).trim() === 'deviceSerialNumber') {
+          return {
+            [String(str[0]).trim()]: emit.SensorDetail(str[1]),
+          };
+        }
+
         return {
           [String(str[0]).trim()]: emit[type](str[1]),
         };
