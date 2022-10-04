@@ -70,10 +70,13 @@ app.listen(PORT, 'localhost', async () => {
 
         case 'SensorData':
           console.log('[SENSOR DATA]');
-          Sensor.findOne({
-            serialNumber: parseRawData.deviceSerialNumber,
+          Sensor.findAll({
+            limit: 1,
+            where: {
+              serialNumber: parseRawData.deviceSerialNumber,
+            },
           }).then((sensor) => {
-            sensor.createWeather({
+            sensor[0].createWeather({
               temperature: parseRawData.T,
               humidity: parseRawData.H,
             });
