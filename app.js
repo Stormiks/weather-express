@@ -53,6 +53,12 @@ app.listen(PORT, 'localhost', async () => {
       const parseRawData = Array.from(message.split(',').map((element) => {
         const str = element.split(':');
 
+        if (String(str[0]).trim() === 'deviceSerialNumber') {
+          return {
+            [String(str[0]).trim()]: emit.SensorDetail(str[1]),
+          };
+        }
+
         return {
           [String(str[0]).trim()]: emit[type](str[1]),
         };
@@ -70,10 +76,14 @@ app.listen(PORT, 'localhost', async () => {
 
         case 'SensorData':
           console.log('[SENSOR DATA]');
-          Sensor.findOne({
-            serialNumber: parseRawData.deviceSerialNumber,
+          Sensor.findAll({
+            limit: 1,
+            where: {
+              serialNumber: parseRawData.deviceSerialNumber,
+            },
+            order: [['createdAt', 'DESC']],
           }).then((sensor) => {
-            sensor.createWeather({
+            sensor[0].createWeather({
               temperature: parseRawData.T,
               humidity: parseRawData.H,
             });
