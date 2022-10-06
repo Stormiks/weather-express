@@ -1,7 +1,11 @@
 {
   "development": {
     "dialect": "sqlite",
-    "storage": "./weather.sqlite3"
+    "storage": "./weather.sqlite3",
+    "migrationStorage": "sequelize",
+    "migrationStorageTableName": "fileMigration",
+    "seederStorage": "sequelize",
+    "seederStorageTableName": "fileSeeds"
   },
   "test": {
     "dialect": "sqlite",
@@ -9,6 +13,10 @@
   },
   "production": {
     "dialect": "sqlite",
-    "storage": "./weather.sqlite3"
+    "storage": "./weather.sqlite3",
+    "migrationStorage": "sequelize",
+    "migrationStorageTableName": "fileMigration",
+    "seederStorage": "sequelize",
+    "seederStorageTableName": "fileSeeds"
   }
 }

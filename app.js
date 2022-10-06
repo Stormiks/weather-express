@@ -1,19 +1,13 @@
 const path = require('path');
+const { spawn } = require('child_process');
 const express = require('express');
-const { SerialPort, ReadlineParser } = require('serialport');
 const cors = require('cors');
 const dotenv = require('dotenv');
 
 dotenv.config();
 const app = express();
-
-const serialport = new SerialPort({
-  path: '/dev/ttyUSB0',
-  baudRate: 9600,
-});
-const parserSerialPort = serialport.pipe(new ReadlineParser({ delimiter: '\r\n' }));
-
 const PORT = 8112;
+const argsPythonProcess = [path.resolve(__dirname, '_sensors', 'sensor_launch.py')];
 
 app.use(cors());
 app.use(express.json());
@@ -21,24 +15,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.resolve(__dirname, 'public')));
 app.set('view engine', 'ejs');
 
-const { Weather, sequelize } = require('./db/models/index.js');
-
-parserSerialPort.on('data', (data) => {
-  let dataTmp = String(data).split(',').map((element) => {
-    const str = element.split('=');
-
-    return {
-      [str[0]]: Number(str[1]),
-    };
-  });
-
-  dataTmp = { ...dataTmp[0], ...dataTmp[1] };
-
-  Weather.create({
-    temperature: dataTmp.T,
-    humidity: dataTmp.H,
-  });
-});
+const { Weather, Sensor, sequelize } = require('./db/models/index.js');
 
 app.get('/', (req, res) => {
   res.render('index');
@@ -60,8 +37,75 @@ app.get('/list', (req, res) => {
 app.listen(PORT, 'localhost', async () => {
   try {
     sequelize.sync();
-    console.log(`Server start http://localhost:${PORT}`);
+    console.info(`Server start http://localhost:${PORT}`);
+
+    const pythonProcess = spawn('python', argsPythonProcess);
+    pythonProcess.stdout.setEncoding('utf8');
+    pythonProcess.stderr.setEncoding('utf8');
+
+    pythonProcess.stdout.on('data', (data) => {
+      const [type, message] = String(data).split('@');
+      const emit = {
+        SensorData: (str) => Number(str),
+        SensorDetail: (str) => String(str).trim(),
+      };
+
+      const parseRawData = Array.from(message.split(',').map((element) => {
+        const str = element.split(':');
+
+        if (String(str[0]).trim() === 'deviceSerialNumber') {
+          return {
+            [String(str[0]).trim()]: emit.SensorDetail(str[1]),
+          };
+        }
+
+        return {
+          [String(str[0]).trim()]: emit[type](str[1]),
+        };
+      })).reduce((prevVal, curVal) => Object.assign(prevVal, curVal), {});
+
+      switch (type) {
+        case 'SensorDetail':
+          console.log('[SENSOR INFO]');
+          Sensor.create({
+            deviceId: parseRawData.deviceId,
+            serialNumber: parseRawData.deviceSerialNumber,
+            manufacturerId: parseRawData.manufacturerId,
+          });
+          break;
+
+        case 'SensorData':
+          console.log('[SENSOR DATA]');
+          Sensor.findAll({
+            limit: 1,
+            where: {
+              serialNumber: parseRawData.deviceSerialNumber,
+            },
+            order: [['createdAt', 'DESC']],
+          }).then((sensor) => {
+            sensor[0].createWeather({
+              temperature: parseRawData.T,
+              humidity: parseRawData.H,
+            });
+          });
+          break;
+
+        default:
+          console.error('[ERROR]: Not found emits');
+          break;
+      }
+    });
+
+    pythonProcess.stderr.on('data', (err) => {
+      console.error(err);
+    });
+
+    pythonProcess.on('exit', () => {
+      console.warn('The python script has exited');
+      process.exit(-1);
+    });
   } catch (error) {
     console.error('Unable to connect to the database:', error);
+    process.exit(-1);
   }
 });
