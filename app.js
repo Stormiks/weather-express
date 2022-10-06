@@ -50,19 +50,22 @@ app.listen(PORT, 'localhost', async () => {
         SensorDetail: (str) => String(str).trim(),
       };
 
-      const parseRawData = Array.from(message.split(',').map((element) => {
-        const str = element.split(':');
+      const parseRawData = Array.from(message.split(',')
+        .map((element) => {
+          const str = element.split(':');
+          const emitName = String(str[0]).trim();
 
-        if (String(str[0]).trim() === 'deviceSerialNumber') {
+          if (emitName === 'deviceSerialNumber') {
+            return {
+              [emitName]: emit.SensorDetail(str[1]),
+            };
+          }
+
           return {
-            [String(str[0]).trim()]: emit.SensorDetail(str[1]),
+            [emitName]: emit[type](str[1]),
           };
-        }
-
-        return {
-          [String(str[0]).trim()]: emit[type](str[1]),
-        };
-      })).reduce((prevVal, curVal) => Object.assign(prevVal, curVal), {});
+        }))
+        .reduce((prevVal, curVal) => Object.assign(prevVal, curVal), {});
 
       switch (type) {
         case 'SensorDetail':
