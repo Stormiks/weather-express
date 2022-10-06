@@ -81,6 +81,7 @@ app.listen(PORT, 'localhost', async () => {
             where: {
               serialNumber: parseRawData.deviceSerialNumber,
             },
+            order: [['createdAt', 'DESC']],
           }).then((sensor) => {
             sensor[0].createWeather({
               temperature: parseRawData.T,
