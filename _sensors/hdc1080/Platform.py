@@ -48,16 +48,16 @@ def platform_detect():
         return BEAGLEBONE_BLACK
     elif plat.lower().find('tegra-aarch64-with-ubuntu') > -1:
         return JETSON_NANO
-        
+
     # Handle Minnowboard
     # Assumption is that mraa is installed
-    try: 
-        import mraa 
+    try:
+        import mraa
         if mraa.getPlatformName()=='MinnowBoard MAX':
             return MINNOWBOARD
     except ImportError:
         pass
-    
+
     # Couldn't figure out the platform, just return unknown.
     return UNKNOWN
 
@@ -141,4 +141,4 @@ def pi_version():
     else:
         # Something else, not a pi.
         return None
-	
+
