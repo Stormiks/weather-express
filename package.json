@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "main": "app.js",
   "scripts": {
-    "dev": "nodemon"
+    "dev": "nodemon",
+    "db:migrate": "sequelize-cli db:migrate",
+    "postinstall": "yarn db:migrate"
   },
   "dependencies": {
     "cors": "2.8.5",
@@ -24,7 +26,8 @@
     "ignore": [
       "*/**/.json",
       "*/**/.pyc",
-      "*/**/.md"
+      "*/**/.md",
+      "*/**/.log"
     ]
   },
   "license": "MIT"
