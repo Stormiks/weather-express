@@ -105,6 +105,7 @@ def make_i2c_rdwr_data(messages):
     data = i2c_rdwr_ioctl_data()
     data.msgs = msg_data
     data.nmsgs = len(messages)
+
     return data
 
 
@@ -138,6 +139,7 @@ class SMBus:
     def __exit__(self, exc_type, exc_val, exc_tb):
         """Context manager exit function, ensures resources are cleaned up."""
         self.close()
+
         return False  # Don't suppress exceptions.
 
     def open(self, bus):
@@ -170,6 +172,7 @@ class SMBus:
             self._device is not None
         ), "Bus must be opened before operations are made against it!"
         self._select_device(addr)
+
         return ord(self._device.read(1))
 
     def read_bytes(self, addr, number):
@@ -178,6 +181,7 @@ class SMBus:
             self._device is not None
         ), "Bus must be opened before operations are made against it!"
         self._select_device(addr)
+
         return self._device.read(number)
 
     def read_byte_data(self, addr, cmd):
@@ -197,6 +201,7 @@ class SMBus:
         )
         # Make ioctl call and return result data.
         ioctl(self._device.fileno(), I2C_RDWR, request)
+
         return result.value
 
     def read_word_data(self, addr, cmd):
@@ -224,6 +229,7 @@ class SMBus:
         )
         # Make ioctl call and return result data.
         ioctl(self._device.fileno(), I2C_RDWR, request)
+
         return result.value
 
     def read_block_data(self, addr, cmd):
@@ -267,12 +273,14 @@ class SMBus:
                     len(cmd),
                     cast(cmdstring, POINTER(c_uint8)),
                 ),  # Write cmd register.
-                (addr, I2C_M_RD, length, cast(result, POINTER(c_uint8))),  # Read data.
+                # Read data.
+                (addr, I2C_M_RD, length, cast(result, POINTER(c_uint8))),
             ]
         )
 
         # Make ioctl call and return result data.
         ioctl(self._device.fileno(), I2C_RDWR, request)
+
         return bytearray(
             result.raw
         )  # Use .raw instead of .value which will stop at a null byte!
@@ -361,8 +369,9 @@ class SMBus:
         # Construct a string of data to send, including room for the command register.
         data = bytearray(len(vals) + 1)
         data[0] = cmd & 0xFF  # Command register at the start.
-        data[1:] = vals[0:]  # Copy in the block data (ugly but necessary to ensure
+        # Copy in the block data (ugly but necessary to ensure
         # the entire write happens in one transaction).
+        data[1:] = vals[0:]
         # Send the data to the device.
         self._select_device(addr)
         self._device.write(data)
@@ -381,7 +390,8 @@ class SMBus:
         # Build ioctl request.
         request = make_i2c_rdwr_data(
             [
-                (addr, 0, 3, cast(pointer(data), POINTER(c_uint8))),  # Write data.
+                # Write data.
+                (addr, 0, 3, cast(pointer(data), POINTER(c_uint8))),
                 (
                     addr,
                     I2C_M_RD,

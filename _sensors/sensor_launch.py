@@ -18,7 +18,8 @@ formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
 console.setFormatter(formatter)
 logging.getLogger('').addHandler(console)
 
-sens.write_register( register = 'CONF', bits = ['MODE_BOTH','HRES_RES1','TRES_RES1'])
+sens.write_register(register='CONF', bits=[
+                    'MODE_BOTH', 'HRES_RES1', 'TRES_RES1'])
 
 (serial, ret) = sens.serial()
 (manufacturer, ret) = sens.manufacturer()
@@ -26,13 +27,16 @@ sens.write_register( register = 'CONF', bits = ['MODE_BOTH','HRES_RES1','TRES_RE
 
 serialNumber = serial
 
-print('SensorDetail@deviceSerialNumber:',serial+',','manufacturerId:',manufacturer+ ',','deviceId:',deviceid, flush=True)
+print('SensorDetail@deviceSerialNumber:', serial+',', 'manufacturerId:',
+      manufacturer + ',', 'deviceId:', deviceid, flush=True)
 
 while True:
-    (temp,hmdt,ret) = sens.both_measurement()
+    (temp, hmdt, ret) = sens.both_measurement()
 
     if ret == 0:
-        strTmp = 'SensorData@deviceSerialNumber:'+str(serialNumber)+',' + 'T:{:.2f}'.format(temp) + ',' + 'H:{:.2f}'.format(hmdt)
+        strTmp = 'SensorData@deviceSerialNumber:' + \
+            str(serialNumber)+',' + \
+            'T:{:.2f}'.format(temp) + ',' + 'H:{:.2f}'.format(hmdt)
         print(strTmp, flush=True)
     else:
         sens._logger.error('Read error %s'.format(ret))
@@ -41,11 +45,9 @@ while True:
     time.sleep(300)
 
 
-
-
 # =======================================================
 
-#15 14 13 12 11 10 09 08 07 06 05 04 03 02 01 00
+# 15 14 13 12 11 10 09 08 07 06 05 04 03 02 01 00
 # 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
 # 00010110 00000000
 # 1600
@@ -61,15 +63,15 @@ while True:
 #print ('{}'.format(register))
 
 #(temp, ret) = sens.measure_temp()
-#if ret == 0 :
+# if ret == 0 :
     #sens._logger.info('Measured Temperate IND: %s \u2103','{0:10.2f}'.format(temp))
-#else :
+# else :
     #sens._logger.error('Read error %s'.format(ret))
 
 #(hmdt, ret) = sens.measure_hmdt()
-#if ret == 0 :
+# if ret == 0 :
     #sens._logger.info('Measured Humidity IND: %s %s','{0:10.2f}'.format(hmdt),'%')
-#else :
+# else :
     #sens._logger.error('Read error %s'.format(ret))
 
 ###########################################################
@@ -83,7 +85,7 @@ while True:
 #print ('{}'.format(register))
 #(measure,ret) = hdc1080.measure_list()
 
-#if ret == 0 :
-    #print('{}'.format(measure))
-#else :
+# if ret == 0 :
+    # print('{}'.format(measure))
+# else :
     #sens._logger.error('Measure Read error %s'.format(ret))

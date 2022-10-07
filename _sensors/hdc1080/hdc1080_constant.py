@@ -14,7 +14,7 @@ SER_ID3            = 0xFD
 MANUF              = 0xFE
 DEVID			   = 0xFF
 
-# CONF 16 Bits allow (MBS):        
+# CONF 16 Bits allow (MBS):
 
 HRES_RES1          = 0x0000   # rw, humidity measurement resolution 14 bit
 HRES_RES2          = 0x0100   # rw, humidity measurement resolution 11 bit
@@ -29,7 +29,7 @@ HEAT_DISABLE       = 0x0000   # rw, heater disabled
 HEAT_ENABLE        = 0x3000   # rw, heater enable
 RST_ON             = 0x8000   # w, software reset
 
-# CONF 16 Bits clear (MBS):        
+# CONF 16 Bits clear (MBS):
 
 HRES_RES1_CLR      = 0xFCFF   # rw, humidity measurement clear (set to 14 bit)
 HRES_RES2_CLR      = 0xFCFF   # rw, humidity measurement clear (set to 14 bit)
