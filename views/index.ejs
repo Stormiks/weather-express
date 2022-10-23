@@ -41,12 +41,23 @@
 
         <div class="inner cover">
           <h1 class="cover-heading">Weather table</h1>
-          <div v-for="item in dataRaw.rows" v-bind:key="item.id">
-            <p>
-              <em>Влажность: </em><span>{{ item.humidity }}</span>
-              <em>Температура: </em><span>{{ item.temperature }}</span>
-              <em>Время считывания показаний: </em> <time>{{ parseCreated(item.createdAt) }}</time>
-            </p>
+          <div>
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Влажность</th>
+                  <th>Температура</th>
+                  <th>Время показаний</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="item in dataRaw.rows" v-bind:key="item.id">
+                  <td>{{ item.humidity }}</td>
+                  <td>{{ item.temperature }}</td>
+                  <td>{{ parseCreated(item.createdAt) }}</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
           <div class="row">
             <nav class="mastmain-pagination" aria-label="Page navigation">
