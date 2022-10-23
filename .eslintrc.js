@@ -22,5 +22,5 @@ module.exports = {
       },
     ],
   },
-  ignorePatterns: ['**/node_modules/**/*', 'less.js'],
+  ignorePatterns: ['**/node_modules/**/*', 'less.js', 'vue.js'],
 };
