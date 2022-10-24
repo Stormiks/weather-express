@@ -33,8 +33,8 @@
             <h3 class="masthead-brand">Weather</h3>
             <nav>
               <ul class="nav masthead-nav">
-                <li class="active"><a href="/">Home</a></li>
-                <li><a href="/sensors">Sensors</a></li>
+                <li><a href="/">Home</a></li>
+                <li class="active"><a href="/sensors">Sensors</a></li>
               </ul>
             </nav>
           </div>
@@ -46,15 +46,17 @@
             <table class="table table-hover">
               <thead>
                 <tr>
-                  <th>Влажность</th>
-                  <th>Температура</th>
-                  <th>Время показаний</th>
+                  <th>Модель</th>
+                  <th>ID датчика</th>
+                  <th>Серийный номер</th>
+                  <th>Дата регистрации</th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-for="item in dataRaw.rows" v-bind:key="item.id">
-                  <td>{{ item.humidity }}</td>
-                  <td>{{ item.temperature }}</td>
+                  <td>{{ item.model }}</td>
+                  <td>{{ item.deviceId }}</td>
+                  <td>{{ item.serialNumber }}</td>
                   <td>{{ parseCreated(item.createdAt) }}</td>
                 </tr>
               </tbody>
@@ -118,15 +120,12 @@
           dataRaw: {},
           pageTable: 1,
           currentPerPage: 10,
-          allPage: computed(() => {
-            return state.dataRaw.count ? Math.round(state.dataRaw.count / state.currentPerPage) : 0;
-          }),
           lastPage: computed(() => {
             return state.numberOfPages;
           }),
           numberOfPages: computed(() => {
             return Math.max(
-              Math.ceil(state.allPage),
+              Math.ceil(state.dataRaw.count / state.currentPerPage),
               1
             );
           }),
@@ -194,11 +193,11 @@
         });
 
         function parseCreated(strDate) {
-          return dayjs(strDate).format('ll');
+          return dayjs(strDate).tz('Asia/Krasnoyarsk').format('LL LT');
         }
 
         function toPageTable(page) {
-          if (!(page >= 1 && page <= state.allPage)) {
+          if (!(page >= 1 && page <= state.numberOfPages)) {
             return;
           }
 
@@ -208,7 +207,7 @@
 
         function fetchDataTable(queryPage = 1) {
           const query = queryPage ? `?page=${queryPage}` : ''
-          fetch(`/list${query}`, { method: 'GET' })
+          fetch(`/sensor-list${query}`, { method: 'GET' })
             .then((data) => data.json())
             .then((data) => state.dataRaw = data)
         }
