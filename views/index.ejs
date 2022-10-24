@@ -8,6 +8,7 @@
   <title>Weather</title>
   <link rel="stylesheet/less" type="text/css" href="/assets/vendors/bootstrap/less/bootstrap.less?v=3.4.1">
   <link rel="stylesheet/less" type="text/css" href="/assets/less/style.less">
+  <script src="/assets/vendors/vuejs/vue.js?v=2.7.13"></script>
   <script>
     const less = {
       env: "development",
@@ -24,7 +25,7 @@
 </head>
 
 <body>
-  <div class="site-wrapper" x-data="app">
+  <div class="site-wrapper" id="app">
     <div class="site-wrapper-inner">
       <div class="cover-container">
         <div class="masthead clearfix">
@@ -40,32 +41,50 @@
 
         <div class="inner cover">
           <h1 class="cover-heading">Weather table</h1>
-          <template x-for="(item, index) in dataRaw.rows" x-bind:key="item.id">
-            <div>
-              <p>
-                <em>Humidity: </em><span x-text="item.humidity"></span>
-                <em>Temperature: </em><span x-text="item.temperature"></span>
-                <em>Time created: </em> <time x-text="parseCreated(item.createdAt)"></time>
-              </p>
-            </div>
-          </template>
+          <div>
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Влажность</th>
+                  <th>Температура</th>
+                  <th>Время показаний</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="item in dataRaw.rows" v-bind:key="item.id">
+                  <td>{{ item.humidity }}</td>
+                  <td>{{ item.temperature }}</td>
+                  <td>{{ parseCreated(item.createdAt) }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
           <div class="row">
-            <nav aria-label="Page navigation">
+            <nav class="mastmain-pagination" aria-label="Page navigation">
               <ul class="pagination">
                 <li>
-                  <a href="#" aria-label="Previous">
+                  <a href="#" aria-label="Previous" v-on:click.prevent="toPageTable(previousPage)">
                     <span aria-hidden="true">&laquo;</span>
                   </a>
                 </li>
-                <template x-for="(page, index) in allPage" x-bind:key="`page-${index}`">
-                  <li><a href="#" @click.prevent="toPageTable(page)" x-text="page"></a></li>
+                <template v-for="(page, index) in pagination">
+                  <li v-bind:class="{ active: page === pageTable }" v-bind:key="`page-${index}`">
+                    <a href="#" v-on:click.prevent="toPageTable(page)">{{ page }}</a>
+                  </li>
                 </template>
                 <li>
-                  <a href="#" aria-label="Next">
+                  <a href="#" aria-label="Next" v-on:click.prevent="toPageTable(nextPage)">
                     <span aria-hidden="true">&raquo;</span>
                   </a>
                 </li>
               </ul>
+              <div class="input-group">
+                <input type="text" class="form-control" placeholder="№" v-model.number="pageTable"
+                  v-on:keyup.enter="toPageTable(pageTable)">
+                <span class="input-group-btn">
+                  <button class="btn btn-default" type="button">Перейти!</button>
+                </span>
+              </div>
             </nav>
           </div>
         </div>
@@ -78,42 +97,130 @@
   <script src="/assets/vendors/dayjs/localizedFormat.js?v=1.11.3"></script>
   <script src="/assets/vendors/dayjs/utc.js?v=1.11.3"></script>
   <script src="/assets/vendors/dayjs/timezone.js?v=1.11.3"></script>
-  <script src="/assets/vendors/dayjs/dayjs.min.js?v=1.11.3"></script>
+  <script src="/assets/vendors/dayjs/dayjs.min.js?v=1.11.6"></script>
   <script src="/assets/vendors/dayjs/ru.js?v=1.11.3"></script>
   <script>
-    document.addEventListener('alpine:init', () => {
-      Alpine.data('app', () => ({
-        dataRaw: {},
-        pageTable: 1,
-        get allPage() {
-          return this.dataRaw ? Math.round(this.dataRaw.count / 10) : 0
-        },
-        parseCreated(strDate) {
-          return dayjs(strDate).format('ll');
-        },
-        toPageTable(page) {
-          this.pageTable = page;
-          this.fetchDataTable(page);
-        },
-        fetchDataTable(queryPage = 1) {
-          const query = queryPage ? `?page=${queryPage}` : ''
-          fetch(`/list${query}`, { method: 'GET' })
-            .then((data) => data.json())
-            .then((data) => this.dataRaw = data)
-        },
-        init() {
+    const { computed, onBeforeMount, onMounted, reactive, toRefs } = Vue
+
+    function range(min, max, step = 1) {
+      let range = [];
+
+      for (let i = min; i <= max; i += step) {
+        range.push(i);
+      }
+
+      return range;
+    }
+    new Vue({
+      setup() {
+        const state = reactive({
+          dataRaw: {},
+          pageTable: 1,
+          currentPerPage: 10,
+          allPage: computed(() => {
+            return state.dataRaw.count ? Math.round(state.dataRaw.count / state.currentPerPage) : 0;
+          }),
+          lastPage: computed(() => {
+            return state.numberOfPages;
+          }),
+          numberOfPages: computed(() => {
+            return Math.max(
+              Math.ceil(state.allPage),
+              1
+            );
+          }),
+          isLastPage: computed(() => {
+            return state.pageTable === state.numberOfPages;
+          }),
+          isFirstPage: computed(() => {
+            return state.pageTable === 1;
+          }),
+          previousPage: computed(() => {
+            return state.pageTable - 1;
+          }),
+          nextPage: computed(() => {
+            return state.pageTable + 1;
+          }),
+          pagination: computed(() => {
+            const { lastPage, pageTable, nextPage, previousPage } = state;
+            if (lastPage === 1) {
+              return [1];
+            }
+
+            if (lastPage <= 7) {
+              return range(1, lastPage);
+            }
+
+            if (lastPage > 7 && pageTable <= 4) {
+              return [1, 2, 3, 4, 5, "...", lastPage];
+            }
+
+            if (lastPage > 8 && lastPage > pageTable + 3) {
+              return [
+                1,
+                "...",
+                previousPage,
+                pageTable,
+                nextPage,
+                "...",
+                lastPage
+              ];
+            }
+
+            if (lastPage > 7 && lastPage <= pageTable + 3) {
+              return [
+                1,
+                "...",
+                lastPage - 3,
+                lastPage - 2,
+                lastPage - 1,
+                lastPage
+              ];
+            }
+          }),
+        });
+
+        onBeforeMount(() => {
           dayjs.locale($('html').attr('lang'));
           dayjs.extend(window.dayjs_plugin_utc);
           dayjs.extend(window.dayjs_plugin_timezone);
           dayjs.extend(window.dayjs_plugin_localizedFormat);
           dayjs.tz.setDefault('Asia/Krasnoyarsk');
+        });
 
-          this.fetchDataTable();
+        onMounted(() => {
+          fetchDataTable();
+        });
+
+        function parseCreated(strDate) {
+          return dayjs(strDate).format('ll');
         }
-      }));
-    });
+
+        function toPageTable(page) {
+          if (!(page >= 1 && page <= state.allPage)) {
+            return;
+          }
+
+          state.pageTable = page;
+          fetchDataTable(page);
+        }
+
+        function fetchDataTable(queryPage = 1) {
+          const query = queryPage ? `?page=${queryPage}` : ''
+          fetch(`/list${query}`, { method: 'GET' })
+            .then((data) => data.json())
+            .then((data) => state.dataRaw = data)
+        }
+
+        return {
+          ...toRefs(state),
+          parseCreated,
+          toPageTable,
+          fetchDataTable
+        };
+      }
+    }).$mount('#app');
   </script>
-  <script src="/assets/vendors/alpinejs/cdn.js?v=3.10.3"></script>
 </body>
 
 </html>

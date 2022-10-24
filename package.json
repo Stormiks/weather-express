@@ -27,5 +27,8 @@
       "*/**/.md"
     ]
   },
+  "engines": {
+    "node": "16.17.1"
+  },
   "license": "MIT"
 }
