@@ -208,7 +208,7 @@
 
         function fetchDataTable(queryPage = 1) {
           const query = queryPage ? `?page=${queryPage}` : ''
-          fetch(`/list${query}`, { method: 'GET' })
+          fetch(`/api/weather-list${query}`, { method: 'GET' })
             .then((data) => data.json())
             .then((data) => state.dataRaw = data)
         }

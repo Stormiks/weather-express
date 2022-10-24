@@ -25,7 +25,7 @@ app.get('/sensors', (req, res) => {
   res.render('sensors');
 });
 
-app.get('/sensor-list', (req, res) => {
+app.get('/api/sensor-list', (req, res) => {
   const PAGE_LIMIT = 10;
 
   Sensor.findAndCountAll({
@@ -38,7 +38,7 @@ app.get('/sensor-list', (req, res) => {
   }).catch((err) => res.send({ err }));
 });
 
-app.get('/list', (req, res) => {
+app.get('/api/weather-list', (req, res) => {
   const PAGE_LIMIT = 10;
 
   Weather.findAndCountAll({
