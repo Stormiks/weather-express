@@ -7,12 +7,12 @@ const dotenv = require('dotenv');
 dotenv.config();
 const app = express();
 const PORT = 8112;
-const argsPythonProcess = [path.resolve('_sensors', 'sensor_launch.py')];
+const argsPythonProcess = [path.resolve(__dirname, '_sensors', 'sensor_launch.py')];
 
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(express.static(path.resolve('public')));
+app.use(express.static(path.resolve(__dirname, 'public')));
 app.set('view engine', 'ejs');
 
 const { Weather, Sensor, sequelize } = require('./db/models/index.js');
