@@ -5,23 +5,17 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.addColumn(
-      'weather',
-      'sensorId',
+      'sensor',
+      'model',
       {
-        type: Sequelize.INTEGER,
-        references: {
-          model: 'Sensor',
-          key: 'id',
-        },
-        onUpdate: 'CASCADE',
-        onDelete: 'SET NULL',
+        type: Sequelize.STRING,
       },
     );
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.removeColumn(
-      'weather',
-      'sensorId',
+      'sensor',
+      'model',
     );
   },
 };
