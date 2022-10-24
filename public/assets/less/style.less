@@ -55,6 +55,14 @@ body {
 /* Padding for spacing */
 .inner {
   padding: 30px;
+
+  table {
+
+    td,
+    th {
+      text-align: center;
+    }
+  }
 }
 
 
@@ -160,6 +168,28 @@ body {
   .cover-container {
     width: 100%;
     /* Must be percentage or pixels for horizontal alignment */
+  }
+}
+
+.mastmain-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  > .input-group {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 1em;
+
+    .input-group-btn {
+      width: auto;
+    }
+
+    input {
+      float: none;
+      width: 100px;
+    }
   }
 }
 
