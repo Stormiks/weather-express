@@ -43,11 +43,7 @@
           <h1 class="cover-heading">Weather table</h1>
           <div class="table-wrapper spinner">
             <div class="spinner-wrapper" v-if="!isLoading">
-              <div class="lds-facebook">
-                <div></div>
-                <div></div>
-                <div></div>
-              </div>
+              <%- include('partials/spinner') %>
             </div>
 
             <table class="table table-hover">
