@@ -114,6 +114,7 @@
 
       return range;
     }
+
     new Vue({
       setup() {
         const state = reactive({
@@ -122,6 +123,9 @@
           currentPerPage: 10,
           lastPage: computed(() => {
             return state.numberOfPages;
+          }),
+          isLoading: computed(() => {
+            return state.numberOfPages > 1
           }),
           numberOfPages: computed(() => {
             return Math.max(
