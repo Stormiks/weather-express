@@ -68,7 +68,7 @@
             </table>
           </div>
           <div class="row">
-            <nav class="mastmain-pagination" aria-label="Page navigation">
+            <nav class="mastmain-pagination" aria-label="Page navigation" v-if="isLoading">
               <ul class="pagination">
                 <li>
                   <a href="#" aria-label="Previous" v-on:click.prevent="toPageTable(previousPage)">
