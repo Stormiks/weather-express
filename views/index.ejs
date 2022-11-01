@@ -61,18 +61,10 @@
 
   <%- include('partials/body-scripts') %>
 
+  <script src="/assets/js/helpers.js"></script>
+
   <script>
     const { computed, onBeforeMount, onMounted, reactive, toRefs } = Vue
-
-    function range(min, max, step = 1) {
-      let range = [];
-
-      for (let i = min; i <= max; i += step) {
-        range.push(i);
-      }
-
-      return range;
-    }
 
     new Vue({
       setup() {
