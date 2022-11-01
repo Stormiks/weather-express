@@ -21,7 +21,24 @@ app.get('/', (req, res) => {
   res.render('index');
 });
 
-app.get('/list', (req, res) => {
+app.get('/sensors', (req, res) => {
+  res.render('sensors');
+});
+
+app.get('/api/sensor-list', (req, res) => {
+  const PAGE_LIMIT = 10;
+
+  Sensor.findAndCountAll({
+    raw: true,
+    nest: true,
+    limit: PAGE_LIMIT,
+    offset: (req.query.page - 1) * PAGE_LIMIT,
+  }).then((data) => {
+    res.json(data);
+  }).catch((err) => res.send({ err }));
+});
+
+app.get('/api/weather-list', (req, res) => {
   const PAGE_LIMIT = 10;
 
   Weather.findAndCountAll({

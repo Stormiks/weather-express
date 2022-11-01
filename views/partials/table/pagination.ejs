@@ -1,0 +1,26 @@
+<nav class="mastmain-pagination" aria-label="Page navigation">
+  <ul class="pagination">
+    <li>
+      <a href="#" aria-label="Previous" v-on:click.prevent="toPageTable(previousPage)">
+        <span aria-hidden="true">&laquo;</span>
+      </a>
+    </li>
+    <template v-for="(page, index) in pagination">
+      <li v-bind:class="{ active: page === pageTable }" v-bind:key="`page-${index}`">
+        <a href="#" v-on:click.prevent="toPageTable(page)">{{ page }}</a>
+      </li>
+    </template>
+    <li>
+      <a href="#" aria-label="Next" v-on:click.prevent="toPageTable(nextPage)">
+        <span aria-hidden="true">&raquo;</span>
+      </a>
+    </li>
+  </ul>
+  <div class="input-group">
+    <input type="text" class="form-control" placeholder="№" v-model.number="pageTable"
+      v-on:keyup.enter="toPageTable(pageTable)">
+    <span class="input-group-btn">
+      <button class="btn btn-default" type="button">Перейти!</button>
+    </span>
+  </div>
+</nav>
