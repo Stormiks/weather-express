@@ -54,6 +54,34 @@ To perform database backups
 sudo apt install make cmake gcc sqlite3
 ```
 
+## NGINX configuration
+
+If you plan to run other node.js applications using NGINX. Then for such applications, there will be approximately the following configuration:
+
+```text
+server {
+  listen 80;
+  listen [::]:80;
+  server_name example.com www.example.com;
+  root /var/www/your_project;
+  gzip on;
+
+  location / {
+    try_files $uri @express;
+  }
+
+  location @express {
+    proxy_pass http://localhost:3000;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+  }
+}
+```
+
 ---
 
 > **P.S.:** When run via "crontab", the database is created in the user's home folder
