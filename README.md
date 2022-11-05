@@ -37,6 +37,24 @@ Add the following lines to the end:
 - "@reboot sleep 30" // 30 seconds after the system starts, run the project
 - "0 */6 * * *" - // Create a database backup every 6 hours
 
+### Systemd service
+
+```
+[Unit]
+Description=Weather Application Service
+After=network.target
+
+[Service]
+WorkingDirectory=/home/<$USER>/www/weather-express-arduino
+ExecStart=/home/<$USER>/.nvm/versions/node/v16.17.1/bin/node app.js
+Restart=on-failure
+User=<$USER>
+Environment=PORT=3000
+
+[Install]
+WantedBy=multi-user.target
+```
+
 ## NVM install
 
 ```sh
