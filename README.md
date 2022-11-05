@@ -30,14 +30,16 @@ crontab -e
 Add the following lines to the end:
 
 ```text
-@reboot sleep 30 && /home/<$USER>/.nvm/versions/node/v16.17.1/bin/node /home/<$USER>/Documents/www/weather-express-arduino/app.js &
+@reboot sleep 30 && /home/<$USER>/.nvm/versions/node/v16.17.1/bin/node /home/<$USER>/www/weather-express-arduino/app.js < /dev/null & // not recommended
 0 */6 * * * /usr/bin/sqlite3 /home/<$USER>/<DB_NAME>.sqlite3 .dump > /home/<$USER>/<DB_NAME>_dump.sql
+// or
+0 */6 * * * /usr/bin/sqlite3 /home/<$USER>/www/weather-express-arduino/<DB_NAME>.sqlite3 .dump > /home/<$USER>/<DB_NAME>_dump.sql
 ```
 
 - "@reboot sleep 30" // 30 seconds after the system starts, run the project
 - "0 */6 * * *" - // Create a database backup every 6 hours
 
-### Systemd service
+### Systemd service (__Recommended__)
 
 ```
 [Unit]
@@ -59,10 +61,10 @@ WantedBy=multi-user.target
 
 ```sh
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
-nvm install 16
-nvm alias default 16
+nvm install 16.17.1
 node --version
-npm i -g yarn sequelize-cli
+nvm alias default 16
+npm i -g yarn sequelize-cli // Required to install migrations
 ```
 
 ## Additional dependencies
@@ -79,10 +81,8 @@ If you plan to run other node.js applications using NGINX. Then for such applica
 ```text
 server {
   listen 80;
-  listen [::]:80;
-  server_name example.com www.example.com;
+  server_name example.test www.example.test;
   root /var/www/your_project;
-  gzip on;
 
   location / {
     try_files $uri @express;
@@ -99,6 +99,7 @@ server {
   }
 }
 ```
+> If you plan to open the application page on the local network, then you must specify the "*.test" domain zone, otherwise browsers will be forced to redirect from the "http" protocol to "https". The known methods of bypass checked by me - do not work.
 
 ---
 
