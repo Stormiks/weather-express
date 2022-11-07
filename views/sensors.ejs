@@ -178,7 +178,7 @@
         });
 
         function onSaveSensor() {
-          $.post('/api/sensors/add', state.modalFormData)
+          $.post('/api/sensor/model/add', state.modalFormData)
             .done(() => fetchSensorModels());
         }
 
@@ -201,13 +201,13 @@
 
         function fetchDataTable(queryPage = 1) {
           const query = queryPage ? `?page=${queryPage}` : ''
-          fetch(`/api/sensors/list${query}`, { method: 'GET' })
+          fetch(`/api/sensor/list${query}`, { method: 'GET' })
             .then((data) => data.json())
             .then((data) => state.dataRaw = data)
         }
 
         function fetchSensorModels() {
-          fetch(`/api/sensor-models/list`, { method: 'GET' })
+          fetch(`/api/sensor/model/list`, { method: 'GET' })
             .then((data) => data.json())
             .then((data) => state.sensorModelsRaw = data)
         }

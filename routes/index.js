@@ -4,10 +4,10 @@ const {
   Weather, Sensor, SensorModel,
 } = require('../db/models/index.js');
 
-module.exports = (app) => {
-  router.get('/sensors/list', (req, res) => {
-    const PAGE_LIMIT = 10;
+const PAGE_LIMIT = 10;
 
+module.exports = (app) => {
+  router.get('/sensor/list', (req, res) => {
     Sensor.findAndCountAll({
       raw: true,
       nest: true,
@@ -18,7 +18,7 @@ module.exports = (app) => {
     }).catch((err) => res.send({ err }));
   });
 
-  router.post('/sensors/add', (req, res) => {
+  router.post('/sensor/model/add', (req, res) => {
     SensorModel.create({
       modelName: req.body.modelName,
     }).then((model) => {
@@ -29,7 +29,7 @@ module.exports = (app) => {
     });
   });
 
-  router.get('/sensor-models/list', (req, res) => {
+  router.get('/sensor/model/list', (req, res) => {
     SensorModel.findAndCountAll({
       raw: true,
       nest: true,
@@ -39,9 +39,7 @@ module.exports = (app) => {
     }).catch((err) => res.status(500).send({ err }));
   });
 
-  router.get('/weather-list', (req, res) => {
-    const PAGE_LIMIT = 10;
-
+  router.get('/weather/list', (req, res) => {
     Weather.findAndCountAll({
       raw: true,
       nest: true,
