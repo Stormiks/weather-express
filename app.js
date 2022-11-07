@@ -5,9 +5,10 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 
 dotenv.config();
-const app = express();
-const PORT = 8112;
+const PORT = process.env.PORT || 3000;
 const argsPythonProcess = [path.join(__dirname, '_sensors', 'sensor_launch.py')];
+
+const app = express();
 
 app.use(cors());
 app.use(express.json());
