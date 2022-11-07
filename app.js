@@ -28,7 +28,7 @@ app.get('/sensors', (req, res) => {
   res.render('sensors');
 });
 
-app.get('/api/sensor-list', (req, res) => {
+app.get('/api/sensors/list', (req, res) => {
   const PAGE_LIMIT = 10;
 
   Sensor.findAndCountAll({
@@ -39,6 +39,16 @@ app.get('/api/sensor-list', (req, res) => {
   }).then((data) => {
     res.json(data);
   }).catch((err) => res.send({ err }));
+});
+
+app.get('/api/sensor-models/list', (req, res) => {
+  SensorModel.findAndCountAll({
+    raw: true,
+    nest: true,
+    attributes: ['id', 'modelName'],
+  }).then((models) => {
+    res.status(200).send(models);
+  }).catch((err) => res.status(500).send({ err }));
 });
 
 app.get('/api/weather-list', (req, res) => {

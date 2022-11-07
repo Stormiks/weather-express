@@ -44,7 +44,7 @@
                 </thead>
                 <tbody>
                   <tr v-for="item in dataRaw.rows" v-bind:key="item.id">
-                    <td>{{ item.model ? item.model : 'Неизвестно' }}</td>
+                    <td>{{ item.model ? sensorModels[item.model] : 'Неизвестно' }}</td>
                     <td>{{ item.deviceId }}</td>
                     <td>{{ item.serialNumber }}</td>
                     <td>{{ parseCreated(item.createdAt) }}</td>
@@ -81,9 +81,20 @@
     new Vue({
       setup() {
         const state = reactive({
+    new Vue({
+      setup() {
+        const state = reactive({
           dataRaw: {},
+          sensorModelsRaw: {},
           pageTable: 1,
           currentPerPage: 10,
+          sensorModels: computed(() => {
+            return state.sensorModelsRaw.rows ? Array.from(state.sensorModelsRaw.rows).reduce((acc, curVal) => {
+              acc[curVal.id] = curVal.modelName;
+
+              return acc;
+            }, {}) : []
+          }),
           lastPage: computed(() => {
             return state.numberOfPages;
           }),
@@ -156,6 +167,7 @@
         });
 
         onMounted(() => {
+          fetchSensorModels();
           fetchDataTable();
         });
 
@@ -174,16 +186,23 @@
 
         function fetchDataTable(queryPage = 1) {
           const query = queryPage ? `?page=${queryPage}` : ''
-          fetch(`/api/sensor-list${query}`, { method: 'GET' })
+          fetch(`/api/sensors/list${query}`, { method: 'GET' })
             .then((data) => data.json())
             .then((data) => state.dataRaw = data)
+        }
+
+        function fetchSensorModels() {
+          fetch(`/api/sensor-models/list`, { method: 'GET' })
+            .then((data) => data.json())
+            .then((data) => state.sensorModelsRaw = data)
         }
 
         return {
           ...toRefs(state),
           parseCreated,
           toPageTable,
-          fetchDataTable
+          fetchDataTable,
+          fetchSensorModels
         };
       }
     }).$mount('#app');
