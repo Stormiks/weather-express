@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "main": "app.js",
   "scripts": {
+    "start": "node app.js",
     "dev": "nodemon"
   },
   "dependencies": {
@@ -29,6 +30,9 @@
   },
   "engines": {
     "node": "16.17.1"
+  },
+  "installConfig": {
+    "pnp": true
   },
   "license": "MIT"
 }
