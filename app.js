@@ -16,7 +16,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.set('port', PORT);
 app.set('view engine', 'ejs');
 
-const { Weather, Sensor, sequelize } = require('./db/models/index.js');
+const {
+  Weather, Sensor, SensorModel, sequelize,
+} = require('./db/models/index.js');
 
 app.get('/', (req, res) => {
   res.render('index');
