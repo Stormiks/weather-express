@@ -41,6 +41,17 @@ app.get('/api/sensors/list', (req, res) => {
   }).catch((err) => res.send({ err }));
 });
 
+app.post('/api/sensors/add', (req, res) => {
+  SensorModel.create({
+    modelName: req.body.modelName,
+  }).then((model) => {
+    res.status(201).send({
+      success: true,
+      data: model,
+    });
+  });
+});
+
 app.get('/api/sensor-models/list', (req, res) => {
   SensorModel.findAndCountAll({
     raw: true,
