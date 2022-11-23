@@ -64,7 +64,7 @@
   <script src="/assets/js/helpers.js"></script>
 
   <script>
-    const { computed, onBeforeMount, onMounted, reactive, toRefs } = Vue
+    const { computed, onBeforeMount, onMounted, reactive, watch, toRefs } = Vue
 
     new Vue({
       setup() {
@@ -138,6 +138,13 @@
           }),
         });
 
+        watch(
+          () => state.pageTable,
+          () => {
+            fetchDataTable();
+          }
+        )
+
         onBeforeMount(() => {
           dayjs.locale($('html').attr('lang'));
           dayjs.extend(window.dayjs_plugin_utc);
@@ -160,12 +167,14 @@
           }
 
           state.pageTable = page;
-          fetchDataTable(page);
         }
 
-        function fetchDataTable(queryPage = 1) {
-          const query = queryPage ? `?page=${queryPage}` : ''
-          fetch(`/api/weather/list${query}`, { method: 'GET' })
+        function fetchDataTable() {
+          const query = {
+            page: state.pageTable,
+            limit: state.currentPerPage
+          }
+          fetch(`/api/weather/list${stringify(query)}`, { method: 'GET' })
             .then((data) => data.json())
             .then((data) => state.dataRaw = data)
         }
