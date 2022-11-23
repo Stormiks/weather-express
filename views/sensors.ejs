@@ -47,7 +47,7 @@
         </div>
 
         <div class="inner cover">
-          <h1 class="cover-heading">Sensors table</h1>
+          <h1 class="cover-heading">Информация о датчике</h1>
 
           <section class="table-wrapper spinner">
             <div class="spinner-wrapper" v-if="!isLoading">
@@ -55,7 +55,7 @@
             </div>
 
             <div class="row table-header"></div>
-            <div class="table-body" v-if="isLoading">
+            <div class="table-body" v-if="isLoading && dataRaw.count">
               <table class="table table-hover">
                 <thead>
                   <tr>
@@ -73,7 +73,7 @@
                 </tbody>
               </table>
             </div>
-            <div class="row table-footer" v-if="isLoading">
+            <div class="row table-footer" v-if="isLoading && dataRaw.count">
               <%- include('partials/table/pagination') %>
             </div>
           </section>
@@ -111,6 +111,7 @@
           pageTable: 1,
           currentPerPage: 10,
           isVisibleModelAdd: false,
+          isLoading: true,
           sensorModels: computed(() => {
             return state.sensorModelsRaw.rows ? Array.from(state.sensorModelsRaw.rows).reduce((acc, curVal) => {
               acc[curVal.id] = curVal.modelName;
@@ -120,9 +121,6 @@
           }),
           lastPage: computed(() => {
             return state.numberOfPages;
-          }),
-          isLoading: computed(() => {
-            return state.numberOfPages > 1
           }),
           numberOfPages: computed(() => {
             return Math.max(
@@ -229,6 +227,8 @@
         }
 
         function fetchDataTable() {
+          state.isLoading = false
+
           const query = {
             page: state.pageTable,
             model: state.sensorTableActiveId,
@@ -239,6 +239,7 @@
             .then((data) => data.json())
             .then((data) => {
               state.dataRaw = data
+              state.isLoading = true
             })
         }
 
