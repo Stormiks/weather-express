@@ -23,28 +23,49 @@
           </div>
         </div>
 
+        <div class="inner sensor-widget">
+          <ul class="nav nav-pills">
+            <li v-bind:class="{ active: key === sensorTableActiveId }" role="button"
+              v-for="(sensorModel, key) in sensorModels" v-bind:key="'sensorModel' + key">
+              <a class="btn btn-default" v-bind:href="'#' + key" v-bind:title="'Датчик ' + sensorModel"
+                v-on:click="sensorTableActiveId = key">{{ sensorModel }}</a>
+            </li>
+            <li>
+              <div class="form-group">
+                <label class="sr-only" for="sensorModelAdd">Добавить модель:</label>
+                <input type="text" class="form-control" id="sensorModelAdd" placeholder="Имя модели"
+                  v-if="isVisibleModelAdd" v-model="modalFormData.modelName" v-on:keydown.enter="onSaveSensor"
+                  v-on:keydown.ctrl.90="onClearModalForm">
+              </div>
+            </li>
+            <li role="button">
+              <a class="btn btn-default" role="button" v-on:click.prevent="onVisibleInputAddModel">
+                <span class="glyphicon glyphicon-plus"></span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
         <div class="inner cover">
           <h1 class="cover-heading">Sensors table</h1>
-          <section class="table-wrapper">
-            <div class="row table-header">
-              <button class="btn btn-primary" type="button" data-toggle="modal" data-target="#sensorAdd">
-                <span class="glyphicon glyphicon-plus"></span>
-                Добавить датчик
-              </button>
+
+          <section class="table-wrapper spinner">
+            <div class="spinner-wrapper" v-if="!isLoading">
+              <%- include('partials/spinner') %>
             </div>
-            <div class="table-body">
+
+            <div class="row table-header"></div>
+            <div class="table-body" v-if="isLoading">
               <table class="table table-hover">
                 <thead>
                   <tr>
-                    <th>Модель</th>
                     <th>ID датчика</th>
                     <th>Серийный номер</th>
                     <th>Дата регистрации</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="item in dataRaw.rows" v-bind:key="item.id">
-                    <td>{{ item.model ? sensorModels[item.model] : 'Неизвестно' }}</td>
+                  <tr v-for="item in dataRaw.rows" v-bind:key="'device' + item.id">
                     <td>{{ item.deviceId }}</td>
                     <td>{{ item.serialNumber }}</td>
                     <td>{{ parseCreated(item.createdAt) }}</td>
@@ -52,15 +73,13 @@
                 </tbody>
               </table>
             </div>
-            <div class="row table-footer">
+            <div class="row table-footer" v-if="isLoading">
               <%- include('partials/table/pagination') %>
             </div>
           </section>
         </div>
       </div>
     </div>
-
-    <%- include('partials/sensor-add-modal') %>
   </div>
 
   <%- include('partials/body-scripts') %>
@@ -68,7 +87,7 @@
   <script src="/assets/js/helpers.js"></script>
 
   <script>
-    const { computed, onBeforeMount, onMounted, reactive, toRefs } = Vue
+    const { computed, onBeforeMount, onMounted, reactive, watch, toRefs } = Vue
 
     function range(min, max, step = 1) {
       let range = [];
@@ -88,8 +107,10 @@
           modalFormData: {
             modelName: ''
           },
+          sensorTableActiveId: null,
           pageTable: 1,
           currentPerPage: 10,
+          isVisibleModelAdd: false,
           sensorModels: computed(() => {
             return state.sensorModelsRaw.rows ? Array.from(state.sensorModelsRaw.rows).reduce((acc, curVal) => {
               acc[curVal.id] = curVal.modelName;
@@ -160,6 +181,12 @@
           }),
         });
 
+        watch(() => [state.sensorTableActiveId, state.pageTable],
+          ([id, prevId], [page, prevPage]) => {
+            fetchDataTable();
+          }
+        )
+
         onBeforeMount(() => {
           dayjs.locale($('html').attr('lang'));
           dayjs.extend(window.dayjs_plugin_utc);
@@ -170,12 +197,14 @@
 
         onMounted(() => {
           fetchSensorModels();
-          fetchDataTable();
-
-          $('#sensorAdd').on('shown.bs.modal', function () {
-            $('#sensorModel').focus();
-          });
         });
+
+        function onVisibleInputAddModel() {
+          state.isVisibleModelAdd = !state.isVisibleModelAdd;
+          Vue.nextTick().then(function () {
+            document.querySelector('#sensorModelAdd').focus()
+          })
+        }
 
         function onSaveSensor() {
           $.post('/api/sensor/model/add', state.modalFormData)
@@ -184,6 +213,7 @@
 
         function onClearModalForm() {
           state.modalFormData.modelName = ''
+          state.isVisibleModelAdd = !state.isVisibleModelAdd;
         }
 
         function parseCreated(strDate) {
@@ -196,14 +226,20 @@
           }
 
           state.pageTable = page;
-          fetchDataTable(page);
         }
 
-        function fetchDataTable(queryPage = 1) {
-          const query = queryPage ? `?page=${queryPage}` : ''
-          fetch(`/api/sensor/list${query}`, { method: 'GET' })
+        function fetchDataTable() {
+          const query = {
+            page: state.pageTable,
+            model: state.sensorTableActiveId,
+            limit: state.currentPerPage
+          }
+
+          fetch(`/api/sensor/list${stringify(query)}`, { method: 'GET' })
             .then((data) => data.json())
-            .then((data) => state.dataRaw = data)
+            .then((data) => {
+              state.dataRaw = data
+            })
         }
 
         function fetchSensorModels() {
@@ -218,6 +254,7 @@
           toPageTable,
           fetchDataTable,
           fetchSensorModels,
+          onVisibleInputAddModel,
           onSaveSensor,
           onClearModalForm
         };
