@@ -9,6 +9,9 @@ const PAGE_LIMIT = 10;
 module.exports = (app) => {
   router.get('/sensor/list', (req, res) => {
     Sensor.findAndCountAll({
+      where: {
+        model: req.query.model,
+      },
       raw: true,
       nest: true,
       limit: PAGE_LIMIT,
