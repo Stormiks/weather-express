@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weather</title>
+
+  <%- include('partials/head-styles') %>
+  <%- include('partials/head-scripts') %>
+</head>
+
+<body>
+  <div class="site-wrapper" id="app">
+    <div class="site-wrapper-inner">
+      <div class="cover-container">
+        <div class="masthead clearfix">
+          <div class="inner">
+            <h3 class="masthead-brand">Weather</h3>
+
+            <%- include('partials/header-nav-site', { linkActive: 'weather' }) %>
+          </div>
+        </div>
+
+        <div class="inner cover">
+          <h1 class="cover-heading">Weather table</h1>
+          <section class="table-wrapper spinner">
+            <div class="spinner-wrapper" v-if="!isLoading">
+              <%- include('partials/spinner') %>
+            </div>
+
+            <div class="row table-header">
+            </div>
+            <div class="table-body" v-if="isLoading">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>Влажность</th>
+                    <th>Температура</th>
+                    <th>Время показаний</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="item in dataRaw.rows" v-bind:key="item.id">
+                    <td>{{ item.humidity }}</td>
+                    <td>{{ item.temperature }}</td>
+                    <td>{{ parseCreated(item.createdAt) }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="row table-footer" v-if="isLoading">
+              <%- include('partials/table/pagination') %>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <%- include('partials/body-scripts') %>
+
+  <script src="/assets/js/helpers.js"></script>
+
+  <script>
+    const { computed, onBeforeMount, onMounted, reactive, watch, toRefs } = Vue
+
+    new Vue({
+      setup() {
+        const state = reactive({
+          dataRaw: {},
+          pageTable: 1,
+          currentPerPage: 10,
+          allPage: computed(() => {
+            return state.dataRaw.count ? Math.round(state.dataRaw.count / state.currentPerPage) : 0;
+          }),
+          isLoading: computed(() => {
+            return state.numberOfPages > 1
+          }),
+          lastPage: computed(() => {
+            return state.numberOfPages;
+          }),
+          numberOfPages: computed(() => {
+            return Math.max(
+              Math.ceil(state.allPage),
+              1
+            );
+          }),
+          isLastPage: computed(() => {
+            return state.pageTable === state.numberOfPages;
+          }),
+          isFirstPage: computed(() => {
+            return state.pageTable === 1;
+          }),
+          previousPage: computed(() => {
+            return state.pageTable - 1;
+          }),
+          nextPage: computed(() => {
+            return state.pageTable + 1;
+          }),
+          pagination: computed(() => {
+            const { lastPage, pageTable, nextPage, previousPage } = state;
+            if (lastPage === 1) {
+              return [1];
+            }
+
+            if (lastPage <= 7) {
+              return range(1, lastPage);
+            }
+
+            if (lastPage > 7 && pageTable <= 4) {
+              return [1, 2, 3, 4, 5, "...", lastPage];
+            }
+
+            if (lastPage > 8 && lastPage > pageTable + 3) {
+              return [
+                1,
+                "...",
+                previousPage,
+                pageTable,
+                nextPage,
+                "...",
+                lastPage
+              ];
+            }
+
+            if (lastPage > 7 && lastPage <= pageTable + 3) {
+              return [
+                1,
+                "...",
+                lastPage - 3,
+                lastPage - 2,
+                lastPage - 1,
+                lastPage
+              ];
+            }
+          }),
+        });
+
+        watch(
+          () => state.pageTable,
+          () => {
+            fetchDataTable();
+          }
+        )
+
+        onBeforeMount(() => {
+          dayjs.locale($('html').attr('lang'));
+          dayjs.extend(window.dayjs_plugin_utc);
+          dayjs.extend(window.dayjs_plugin_timezone);
+          dayjs.extend(window.dayjs_plugin_localizedFormat);
+          dayjs.tz.setDefault('Asia/Krasnoyarsk');
+        });
+
+        onMounted(() => {
+          fetchDataTable();
+        });
+
+        function parseCreated(strDate) {
+          return dayjs(strDate).format('ll');
+        }
+
+        function toPageTable(page) {
+          if (!(page >= 1 && page <= state.allPage)) {
+            return;
+          }
+
+          state.pageTable = page;
+        }
+
+        function fetchDataTable() {
+          const query = {
+            page: state.pageTable,
+            limit: state.currentPerPage
+          }
+          fetch(`/api/weather/list${stringify(query)}`, { method: 'GET' })
+            .then((data) => data.json())
+            .then((data) => state.dataRaw = data)
+        }
+
+        return {
+          ...toRefs(state),
+          parseCreated,
+          toPageTable,
+          fetchDataTable
+        };
+      }
+    }).$mount('#app');
+  </script>
+</body>
+
+</html>
