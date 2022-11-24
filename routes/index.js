@@ -53,5 +53,17 @@ module.exports = (app) => {
     }).catch((err) => res.send({ err }));
   });
 
+  router.get('/weather/latest', (req, res) => {
+    Weather.findAll({
+      limit: PAGE_LIMIT,
+      attributes: {
+        exclude: ['deletedAt', 'updatedAt'],
+      },
+      order: [['createdAt', 'DESC']],
+    }).then((data) => {
+      res.json(data);
+    }).catch((err) => res.send({ err }));
+  });
+
   app.use('/api/', router);
 };

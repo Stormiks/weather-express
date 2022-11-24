@@ -23,6 +23,10 @@ app.get('/', (req, res) => {
   res.render('index');
 });
 
+app.get('/weather', (req, res) => {
+  res.render('weather');
+});
+
 app.get('/sensors', (req, res) => {
   res.render('sensors');
 });
