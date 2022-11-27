@@ -35,7 +35,7 @@ require('./routes/index.js')(app);
 
 app.listen(app.get('port'), 'localhost', async () => {
   try {
-    sequelize.sync();
+    sequelize.authenticate();
     console.info(`Server start http://localhost:${app.get('port')}`);
     if (process.env.NODE_ENV === 'production') {
       const pythonProcess = spawn('python', argsPythonProcess);
