@@ -26,6 +26,7 @@ const SensorModel = require('./sensormodel.js')(sequelize, Sequelize.DataTypes);
 Sensor.hasMany(Weather, {
   onDelete: 'cascade',
 });
+Weather.belongsTo(Sensor);
 
 Sensor.hasOne(SensorModel);
 
