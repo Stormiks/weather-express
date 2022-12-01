@@ -26,8 +26,13 @@ const SensorModel = require('./sensormodel.js')(sequelize, Sequelize.DataTypes);
 Sensor.hasMany(Weather, {
   onDelete: 'cascade',
 });
+Weather.belongsTo(Sensor);
 
 Sensor.hasOne(SensorModel);
+
+sequelize.authenticate().then(() => {
+  console.log('✅ [ORM] Auth DB success');
+});
 
 module.exports = {
   Weather,

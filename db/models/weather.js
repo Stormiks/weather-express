@@ -23,6 +23,13 @@ module.exports = (sequelize, DataTypes) => {
   Weather.init({
     temperature: DataTypes.REAL,
     humidity: DataTypes.REAL,
+    sensorId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'Sensor',
+        key: 'id',
+      },
+    },
   }, {
     sequelize,
     modelName: 'Weather',
