@@ -158,7 +158,7 @@
         });
 
         function parseCreated(strDate) {
-          return dayjs(strDate).format('ll');
+          return dayjs(strDate).tz('Asia/Krasnoyarsk').format('LL LT');
         }
 
         function toPageTable(page) {
