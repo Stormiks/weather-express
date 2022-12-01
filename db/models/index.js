@@ -30,6 +30,10 @@ Weather.belongsTo(Sensor);
 
 Sensor.hasOne(SensorModel);
 
+sequelize.authenticate().then(() => {
+  console.log('✅ [ORM] Auth DB success');
+});
+
 module.exports = {
   Weather,
   Sensor,
