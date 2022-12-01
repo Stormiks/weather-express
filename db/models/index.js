@@ -21,9 +21,18 @@ if (config.use_env_variable) {
 
 const Weather = require('./weather.js')(sequelize, Sequelize.DataTypes);
 const Sensor = require('./sensor.js')(sequelize, Sequelize.DataTypes);
+const SensorModel = require('./sensormodel.js')(sequelize, Sequelize.DataTypes);
 
-Sensor.hasMany(Weather, { onDelete: 'cascade' });
+Sensor.hasMany(Weather, {
+  onDelete: 'cascade',
+});
+
+Sensor.hasOne(SensorModel);
 
 module.exports = {
-  Weather, Sensor, sequelize, Sequelize,
+  Weather,
+  Sensor,
+  SensorModel,
+  sequelize,
+  Sequelize,
 };

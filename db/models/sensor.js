@@ -24,7 +24,13 @@ module.exports = (sequelize, DataTypes) => {
     deviceId: DataTypes.STRING,
     serialNumber: DataTypes.STRING,
     manufacturerId: DataTypes.STRING,
-    model: DataTypes.STRING,
+    model: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'SensorModel',
+        key: 'id',
+      },
+    },
   }, {
     sequelize,
     modelName: 'Sensor',

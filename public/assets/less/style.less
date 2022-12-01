@@ -14,7 +14,6 @@ a:hover {
   color: @color-black-light;
   text-shadow: none;
   background-color: @color-basic-white;
-  border: 1px solid @color-basic-white;
 }
 
 /*
@@ -28,10 +27,14 @@ body {
 }
 
 body {
-  color: @color-basic-white;
-  text-align: center;
-  text-shadow: 0 1px 3px rgba(@color-basic-black, .5);
+  .site-wrapper-inner {
+    color: @color-basic-white;
+    text-align: center;
+    text-shadow: 0 1px 3px rgba(@color-basic-black, .5);
+  }
 }
+
+@import "./navs";
 
 .site-wrapper {
   display: table;
@@ -56,8 +59,8 @@ body {
   padding: 30px;
 }
 
+@import "./slider";
 @import "./table";
-
 
 /*
  * Header

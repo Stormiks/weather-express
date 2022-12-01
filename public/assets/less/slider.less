@@ -1,0 +1,71 @@
+.carousel-wrapper {
+  min-height: 450px;
+
+  .carousel {
+    min-height: inherit;
+  }
+
+  .carousel-control {
+    &:hover {
+      opacity: none;
+    }
+
+    &.right,
+    &.left {
+      background: none;
+    }
+  }
+}
+
+.carousel-inner {
+  min-height: inherit;
+
+  .item {
+    align-items: center;
+    justify-content: center;
+    min-height: inherit;
+  }
+
+  > .active,
+  > .next,
+  > .prev {
+    display: flex;
+  }
+}
+
+.carousel-indicators {
+
+  li.active,
+  li {
+    margin: 0 4px 0;
+
+  }
+
+  @media screen and (min-width: 768px) {
+    bottom: 10px;
+  }
+}
+
+.weather-item {
+  display: flex;
+  flex-wrap: nowrap;
+
+  .item-data {
+    display: flex;
+    align-items: center;
+
+    + .item-data {
+      margin-left: 2rem;
+    }
+  }
+}
+
+.weather-icon svg {
+  fill: darken(saturate(spin(@brand-primary, 0.3101), 2.0597), 10.0000);
+  height: 150px;
+  width: 250px;
+
+  text {
+    fill: @color-basic-white;
+  }
+}
