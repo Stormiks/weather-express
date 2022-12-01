@@ -4,15 +4,15 @@
  */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.removeColumn(
-      'sensor',
-      'model',
-      {
-        type: Sequelize.STRING,
-      },
+    await queryInterface.addColumn('weather', 'sensorIds', {
+      type: Sequelize.INTEGER,
+    });
+
+    await queryInterface.sequelize.query(
+      'UPDATE weather SET sensorIds = `weather`.`sensorId`',
     );
 
-    await queryInterface.addColumn(
+    await queryInterface.changeColumn(
       'sensor',
       'model',
       {
@@ -25,11 +25,12 @@ module.exports = {
         onDelete: 'SET NULL',
       },
     );
-  },
-  async down(queryInterface, Sequelize) {
-    await queryInterface.removeColumn(
-      'sensor',
-      'model',
+
+    await queryInterface.sequelize.query(
+      'UPDATE weather SET sensorId = `weather`.`sensorIds`',
     );
+
+    await queryInterface.removeColumn('weather', 'sensorIds');
   },
+  async down(queryInterface, Sequelize) { },
 };

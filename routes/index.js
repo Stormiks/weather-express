@@ -48,6 +48,7 @@ module.exports = (app) => {
       nest: true,
       limit: PAGE_LIMIT,
       offset: (req.query.page - 1) * PAGE_LIMIT,
+      order: [['createdAt', 'DESC']],
     }).then((data) => {
       res.json(data);
     }).catch((err) => res.send({ err }));

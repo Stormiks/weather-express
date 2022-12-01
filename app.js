@@ -11,13 +11,13 @@ const argsPythonProcess = [path.join(__dirname, '_sensors', 'sensor_launch.py')]
 const app = express();
 
 app.use(cors());
-app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 app.set('port', PORT);
 app.set('view engine', 'ejs');
 
-const { Sensor, sequelize } = require('./db/models/index.js');
+const { Sensor } = require('./db/models/index.js');
 
 app.get('/', (req, res) => {
   res.render('index');
@@ -35,8 +35,7 @@ require('./routes/index.js')(app);
 
 app.listen(app.get('port'), 'localhost', async () => {
   try {
-    sequelize.sync();
-    console.info(`Server start http://localhost:${app.get('port')}`);
+    console.log(`✅ [SERVER] http://localhost:${app.get('port')}`);
     if (process.env.NODE_ENV === 'production') {
       const pythonProcess = spawn('python', argsPythonProcess);
       pythonProcess.stdout.setEncoding('utf8');
