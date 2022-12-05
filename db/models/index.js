@@ -28,7 +28,8 @@ Sensor.hasMany(Weather, {
 });
 Weather.belongsTo(Sensor);
 
-Sensor.hasOne(SensorModel);
+SensorModel.hasMany(Sensor, { foreignKey: 'model' });
+Sensor.belongsTo(SensorModel, { foreignKey: 'model' });
 
 sequelize.authenticate().then(() => {
   console.log('✅ [ORM] Auth DB success');
