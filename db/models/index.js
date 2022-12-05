@@ -27,7 +27,8 @@ Sensor.hasMany(Weather, {
   onDelete: 'cascade',
 });
 
-Sensor.hasOne(SensorModel);
+SensorModel.hasMany(Sensor, { foreignKey: 'model' });
+Sensor.belongsTo(SensorModel, { foreignKey: 'model' });
 
 module.exports = {
   Weather,
