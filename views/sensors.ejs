@@ -54,7 +54,7 @@
               <%- include('partials/spinner') %>
             </div>
 
-            <div class="row table-header"></div>
+            <div class="row table-header" v-if="sensorTableActiveId"></div>
             <div class="table-body" v-if="isLoading && dataRaw.count">
               <table class="table table-hover">
                 <thead>
